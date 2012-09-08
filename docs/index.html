@@ -1,0 +1,113 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>CodeIgniter Token-based CSRF for Facebook : Class Guide</title>
+
+<style type='text/css' media='all'>@import url('userguide.css');</style>
+<link rel='stylesheet' type='text/css' media='all' href='userguide.css' />
+
+</head>
+<body>
+
+<!-- START CONTENT -->
+<div id="content">
+
+<h1><strong>HTML Token-based CSRF for Facebook</strong></h1>
+
+<p><strong>HTML Token-based (not cookie-based) CSRF protection for CodeIgniter.</strong><br />
+This class extends the native CodeIgniter Form Validation class and allows users easily to implement CSRF into their web forms that will work on Facebook!</p>
+<br /><br />
+<h1 id="example_usage">Example Usage</h1>
+
+<p>The following example will show you how to easily implement and use the CSRF library into your application.<br /><br /></p>
+
+<h3>Integration</h3>
+<code>
+Place the <var>"MY_Form_validation.php"</var> class in your <var>'application/libraries'</var> folder. That's it!
+</code>
+<br />
+<h3>Your Controller</h3>
+<p>For this demonstration, we will be using a copy of the CI welcome controller that everyone's familiar with.</p>
+<code>
+class Welcome extends CI_Controller {<br /><br />
+
+&nbsp;&nbsp;&nbsp;&nbsp;public function index(){<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this->load->library('form_validation');<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$data['csrf'] = $this->form_validation->create_csrf(time(), "secure", true);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this->load->view('welcome_message', $data);<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+	<br />
+&nbsp;&nbsp;&nbsp;&nbsp;public function submit(){<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$this->load->library('form_validation');<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if ($this->form_validation->validate_csrf("secure")) {<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//continue with the code<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}else{	<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;//do something regarding errors<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+&nbsp;&nbsp;&nbsp;&nbsp;}<br />
+}<br />
+</code>
+<p>In your default(index) method you'll notice that we load the form validation class <dfn>$this->load->library('form_validation')</dfn>. We need this to then create the actual CSRF Token and key here <dfn>$this->form_validation->create_csrf(time(), "secure", true)</dfn> and we assign it to a variable called 'csrf here <dfn>$data['csrf']</dfn>. The parameters of the 'create_csrf' method are defined below in the function reference section. We then pass this information into our view as the customary $data array.<br /><br />In the submit method (the one that's called when a user clicks the submit button on the form) we once again load the form validation library. In order to verify the CSRF data, all you need to do is run this code <dfn>$this->form_validation->validate_csrf("secure")</dfn> and the method will return true if valid and false if not valid. <br /><br /><strong>Please Note:</strong> If you use the 'secure' parameter to create the token data, you must also use the 'secure' parameter to check against, otherwise the method will always return false.</p>
+<br />
+<h3>Your View</h3>
+<p>This is just a bare-bones form. Obviously your form would have other code like 'set_value' and other helpful CI helpers.</p>
+<code>
+&#60;form action="submit" method="post"&#62;<br /><br />
+&nbsp;&nbsp;&nbsp;&nbsp;&#60;?php if(isset($csrf)) echo $csrf;	?&#62;<br /><br />
+	
+&nbsp;&nbsp;&nbsp;&nbsp;&#60;label for="name"&#62;Your Name&#60;/label&#62;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&#60;input type="input" id="name" name="name" /&#62;<br />
+	
+&nbsp;&nbsp;&nbsp;&nbsp;&#60;label for="email"&#62;Your Email&#60;/label&#62;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&#60;input type="input" id="email" name="email" /&#62;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&#60;input type="submit" value="submit" /&#62;<br />
+&#60;/form&#62;
+</code>
+<p>In order to implement CSRF into your form, all you have to do is put the following into your form <dfn>&#60;?php if(isset($csrf)) echo $csrf; ?&#62;</dfn>. You can see that you're simply echoing the '$csrf' variable which you set in your controller. The php code creates two hidden input fields in your form which are then used in the class for validation.</p>
+<br /><br />
+<h1 id="function_reference">Function Reference</h1>
+
+<h2>create_csrf(<var>timestamp</var>['string'], <var>method</var>['string'], <var>outputHTML</var>['boolean'])</h2>
+<p>This is the function that creates the CSRF token data for your forms.</p>
+
+<code>
+$data = $this->form_validation->create_csrf(time(), "secure", true);
+</code>
+
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+<tr>
+<th>Preference</th>
+<th>Default&nbsp;Value</th>
+<th>Options</th>
+<th>Description</th>
+</tr><tr>
+<td class="td"><strong>timestamp</strong></td><td class="td">None</td><td class="td">none</td><td class="td">The timestamp to be used as the validation key.</td>
+</tr><tr>
+<td class="td"><strong>method</strong></td><td class="td">standard</td><td class="td">standard, secure</td><td class="td">The method for creating the token hash/cypertext. standard uses SHA1 and secure uses the codeigniter internal encryption classes.</td>
+</tr><tr>
+<td class="td"><strong>outputHTML</strong></td><td class="td">true</td><td class="td">true, false</td><td class="td">True: tells the class to return the 2 hidden input fields as html. False: returns just the hash/cypertext and not html. This is useful if you want to just get the hash/cypertext to extend this library.</td>
+</tr>
+</table>
+
+<h2>validate_csrf(<var>method</var>['string'])</h2>
+
+<p>This is the function that validates the tokens.</p>
+<code>$trueFalse = $this->form_validation->validate_csrf("secure");</code>
+<table cellpadding="0" cellspacing="1" border="0" style="width:100%" class="tableborder">
+<tr>
+<th>Preference</th>
+<th>Default&nbsp;Value</th>
+<th>Options</th>
+<th>Description</th>
+</tr><tr>
+<td class="td"><strong>method</strong></td><td class="td">standard</td><td class="td">standard, secure</td><td class="td">Based on the settings you used in the 'create_csrf' method, this function validates the tokens. Please note: if you used standard for creation, you must use standard for validation and vice versa. </td>
+</tr>
+</table>
+</div>
+<br /><br /><br />
+<!-- END CONTENT -->
+</body>
+</html>

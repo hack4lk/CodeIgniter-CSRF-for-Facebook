@@ -7,7 +7,7 @@
  * @package		CSRF
  * @author		Lukasz Karpuk (http://www.freshwebtrends.com)
  * @version		1.0.0
- * @license		MIT License Copyright (c) 2008 Erick Hartanto
+ * @license		MIT License Copyright (c) 2012 Lukasz Karpuk
  */
  
 class MY_Form_validation extends CI_Form_validation{
@@ -96,5 +96,5 @@ class MY_Form_validation extends CI_Form_validation{
 		}
 	}
 }
-/* End of file CSRF.php */
-/* Location: ./application/libraries/CSRF.php */
+/* End of file MY_Form_validation.php */
+/* Location: ./application/libraries/MY_Form_validation.php */
